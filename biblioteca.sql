@@ -63,7 +63,7 @@ CREATE TABLE loans(
 SELECT isbn, title, page_count FROM books WHERE page_count < 300;
 
 -- Authors was born after than 1970
-SELECT name, surname FROM authors WHERE birth_date > 1970-01-01;
+SELECT name, surname FROM authors WHERE birth_date > 1970;
 
 -- Most popular book
 SELECT x.title

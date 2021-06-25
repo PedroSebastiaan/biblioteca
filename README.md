@@ -1,0 +1,1 @@
+Examen correspondiente al modulo de Lenguaje de base de datos relacionales.

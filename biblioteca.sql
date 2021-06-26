@@ -46,16 +46,24 @@ CREATE TABLE relations(
 \copy relations FROM 'relations.csv' csv header;
 
 CREATE TABLE loans(
+    id SERIAL UNIQUE NOT NULL,
     partner_phone INT,
     book_isbn VARCHAR(15),
-    start_date DATE NOT NULL,
-    expected_return_date DATE NOT NULL,
-    real_return_date DATE NOT NULL,
     FOREIGN KEY (partner_phone) REFERENCES partners(phone),
     FOREIGN KEY (book_isbn) REFERENCES books(isbn)
 );
 
 \copy loans FROM 'loans.csv' csv header;
+
+CREATE TABLE deadlines(
+    loan_id INT,
+    start_date DATE NOT NULL,
+    expected_return_date DATE NOT NULL,
+    real_return_date DATE NOT NULL,
+    FOREIGN KEY (loan_id) REFERENCES loans(id)
+);
+
+\copy deadlines FROM 'deadlines.csv' csv header;
 
 --CREATE REQUEST
 
@@ -79,10 +87,15 @@ ON c.book_isbn = b.isbn);
 -- Penalty users
 SELECT p.name, p.surname, m.days, m.days*100 AS balance
 FROM partners AS p
-INNER JOIN (SELECT real_return_date::date - expected_return_date::date AS days, partner_phone
-FROM loans
-WHERE real_return_date::date - expected_return_date::date > 0) AS m
+INNER JOIN (SELECT l.id, l.partner_phone, d.days 
+FROM loans as l
+INNER JOIN (SELECT loan_id, real_return_date::date - expected_return_date::date AS days
+FROM deadlines
+WHERE real_return_date::date - expected_return_date::date > 0) AS d
+ON l.id = d.loan_id) AS m
 ON p.phone = m.partner_phone;
+
+
 
 
 

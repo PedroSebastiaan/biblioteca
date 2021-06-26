@@ -5,12 +5,46 @@ CREATE DATABASE biblioteca;
 
 \c biblioteca 
 
+CREATE TABLE cities(
+    id SERIAL UNIQUE NOT NULL PRIMARY KEY,
+    name VARCHAR(20) NOT NULL
+);
+
+\copy cities FROM 'cities.csv' csv header;
+
+CREATE TABLE address_names(
+    id SERIAL UNIQUE NOT NULL PRIMARY KEY,
+    name VARCHAR(30) NOT NULL
+);
+
+\copy address_names FROM 'address_names.csv' csv header;
+
+CREATE TABLE address(
+    id SERIAL UNIQUE NOT NULL PRIMARY KEY,
+    address_name_id INT NOT NULL,
+    number INT NOT NULL,
+    FOREIGN KEY (address_name_id) REFERENCES address_names(id)
+);
+
+\copy address FROM 'address.csv' csv header;
+
+CREATE TABLE locations(
+    id SERIAL UNIQUE NOT NULL PRIMARY KEY,
+    city_id INT NOT NULL,
+    address_id INT NOT NULL,
+    FOREIGN KEY (city_id) REFERENCES cities(id),
+    FOREIGN KEY (address_id) REFERENCES address(id)
+);
+
+\copy locations FROM 'locations.csv' csv header;
+
 CREATE TABLE partners(
     phone INT UNIQUE NOT NULL PRIMARY KEY,
     rut VARCHAR(20) UNIQUE NOT NULL,
     name VARCHAR(20) NOT NULL,
     surname VARCHAR(20) NOT NULL,
-    address VARCHAR(20) NOT NULL
+    location_id INT NOT NULL,
+    FOREIGN KEY (location_id) REFERENCES locations(id)
 );
 
 \copy partners FROM 'partners.csv' csv header;
